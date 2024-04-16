@@ -12,32 +12,23 @@ Where p.LastName LIKE 'L%'
 Order By p.LastName,p.FirstName
 
 --3
-WITH RankedSales AS (
-    SELECT 
-        ROW_NUMBER() OVER (PARTITION BY a.PostalCode ORDER BY s.SalesYTD DESC) AS RowNum,
-        p.LastName,
-        s.SalesYTD,
-        a.PostalCode
-    FROM 
-        Sales.SalesPerson s
-    JOIN 
-        Person.Person p ON s.BusinessEntityID = p.BusinessEntityID
-    JOIN 
-        Person.Address a ON s.TerritoryID = a.AddressID
-    WHERE 
-        s.TerritoryID IS NOT NULL
-        AND s.SalesYTD <> 0
-)
-   SELECT 
-     RowNum,
-     LastName,
-     SalesYTD,
-     PostalCode
-   FROM 
-    RankedSales
-   ORDER BY 
-    PostalCode ASC, 
-    SalesYTD DESC;
+SELECT 
+    ROW_NUMBER() OVER(PARTITION BY a.PostalCode ORDER BY sp.SalesYTD DESC) AS RowNum,
+    p.LastName,
+    sp.SalesYTD,
+    a.PostalCode
+FROM 
+    Sales.SalesPerson sp
+JOIN 
+    Person.Person p ON sp.BusinessEntityID = p.BusinessEntityID
+JOIN 
+    Person.Address a ON sp.BusinessEntityID = a.AddressID
+WHERE 
+    sp.TerritoryID IS NOT NULL 
+    AND sp.SalesYTD <> 0
+ORDER BY 
+    a.PostalCode ASC,
+    sp.SalesYTD DESC;
 
 --4
 SELECT SalesOrderId, SUM(LineTotal) as TotalSum 
